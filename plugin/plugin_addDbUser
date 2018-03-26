@@ -1,0 +1,101 @@
+arg_methods[${#arg_methods[@]}]="addDbUser"
+
+function pluginHelp_addDbUser(){
+    cat << EOF
+addDbUser
+    <db_name>
+    <user_name>
+    <user_password>
+    <user_host>
+EOF
+}
+
+function plugin_addDbUser(){
+
+    if [[ $# -lt 4 ]]; then
+        echo "ERROR: addDbUser <db_name> <user_name> <user_pass> <user_host>"
+        return 1
+    fi
+
+    local paramDbName=$1
+    local paramUserName=$2
+    local paramUserPass=$3
+    local paramUserHost=$4
+
+    if [[ "" == "$paramDbName" \
+        || "" == "$paramUserName" \
+        || "" == "$paramUserPass" \
+        || "" == "$paramUserHost" ]]; then
+        echo "ERROR: addDbUser param empty"
+        return 1
+    fi
+
+    if [[ "" == $arg_password ]]; then
+        local argExt=""
+    else
+        local argExt="-p$arg_password"
+    fi
+
+    local dbList=`$arg_baseDir/bin/mysql \
+        -S $PATH_ROOT/var/mysqld.sock \
+        -N -s \
+        -uroot \
+        $argExt \
+        -e "SHOW DATABASES LIKE \"${paramDbName}\"" 2>/dev/null`
+
+    if [[ 0 -ne $? ]]; then
+        echo "ERROR: get db list fail"
+        return 1
+    fi
+
+    if [[ ! "$paramDbName" == "$dbList" ]]; then
+        $arg_baseDir/bin/mysql \
+            -S $PATH_ROOT/var/mysqld.sock \
+            -uroot \
+            $argExt \
+            -e "CREATE DATABASE \`${paramDbName}\`;"
+
+        if [[ 0 -ne $? ]]; then
+            echo "ERROR: create database ${paramDbName} fail"
+            return 1
+        fi
+        echo "INFO: create database ${paramDbName} success"
+    fi
+
+    $arg_baseDir/bin/mysql \
+        -S $PATH_ROOT/var/mysqld.sock \
+        -uroot \
+        $argExt \
+        -e "INSERT INTO \
+                mysql.user (\`Host\`, \`User\`, \`Password\`) \
+            VALUES \
+                (\"${paramUserHost}\", \"${paramUserName}\", PASSWORD(\"${paramUserPass}\"));FLUSH PRIVILEGES;"
+
+    if [[ 0 -ne $? ]]; then
+        echo "ERROR: add user ${paramUserName}:${paramUserPass}@${paramUserHost} fail"
+        return 1
+    fi
+
+    echo "INFO: add user ${paramUserName}:${paramUserPass}@${paramUserHost} success"
+
+    $arg_baseDir/bin/mysql \
+        -S $PATH_ROOT/var/mysqld.sock \
+        -uroot \
+        $argExt \
+        -e "GRANT ALL PRIVILEGES ON \
+                \`${paramDbName}\`.* \
+            TO \
+                ${paramUserName}@${paramUserHost} \
+            IDENTIFIED BY \
+                \"${paramUserPass}\";FLUSH PRIVILEGES;"
+
+    if [[ 0 -ne $? ]]; then
+        echo "ERROR: grant privileges ${paramUserName}:${paramUserPass}@${paramUserHost} on ${paramDbName} fail"
+        return 1
+    fi
+
+    echo "INFO: add user ${paramUserName}:${paramUserPass}@${paramUserHost} on ${paramDbName} success"
+
+    return 0
+
+}

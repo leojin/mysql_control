@@ -1,0 +1,42 @@
+arg_methods[${#arg_methods[@]}]="stop"
+
+function pluginHelp_stop(){
+    cat << EOF
+stop
+EOF
+}
+
+function plugin_stop(){
+
+    if [[ ! -f $PATH_ROOT/var/mysqld.pid ]]; then
+        echo "ERROR: mysql is not running"
+        return 1
+    fi
+
+    if [[ "" == $arg_password ]]; then
+        local argExt=""
+    else
+        local argExt="-p$arg_password"
+    fi
+
+    $arg_baseDir/bin/mysqladmin \
+        -S $PATH_ROOT/var/mysqld.sock \
+        -uroot \
+        $argExt \
+        shutdown
+
+    if [[ 0 -ne $? ]]; then
+        echo "ERROR: mysql stop fail"
+        return 1
+    fi
+
+    if [[  -f $PATH_ROOT/var/mysqld.pid ]]; then
+        echo "ERROR: mysql is still running"
+        return 1
+    fi
+
+    echo "INFO: mysql stop success"
+
+    return 0
+
+}

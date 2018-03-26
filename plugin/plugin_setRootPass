@@ -1,0 +1,53 @@
+arg_methods[${#arg_methods[@]}]="setRootPass"
+
+function pluginHelp_setRootPass(){
+    cat << EOF
+setRootPass
+    <new_password>
+EOF
+}
+
+function plugin_setRootPass(){
+
+    if [[ $# -lt 1 ]]; then
+        echo "ERROR: setRootPass <new_password>"
+        return 1
+    fi
+
+    local paramPassword=$1
+
+    if [[ "" == $arg_password ]]; then
+        local argExt=""
+    else
+        local argExt="-p$arg_password"
+    fi
+
+    $arg_baseDir/bin/mysql \
+        -S $PATH_ROOT/var/mysqld.sock \
+        -uroot \
+        $argExt \
+        -e 'DELETE FROM mysql.user WHERE user="";FLUSH PRIVILEGES;'
+
+    if [[ 0 -ne $? ]]; then
+        echo "ERROR: clear empty user fail"
+        return 1
+    fi
+
+    $arg_baseDir/bin/mysqladmin \
+        -S $PATH_ROOT/var/mysqld.sock \
+        -uroot \
+        $argExt \
+        password $paramPassword
+
+    if [[ 0 -ne $? ]]; then
+        echo "ERROR: change root password fail"
+        return 1
+    fi
+
+    echo "INFO: change root password success"
+
+    return 0
+
+}
+
+

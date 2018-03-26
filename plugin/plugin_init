@@ -1,0 +1,55 @@
+arg_methods[${#arg_methods[@]}]="init"
+
+function pluginHelp_init(){
+    cat << EOF
+init
+    <port:default $DEFAULT_PORT>
+EOF
+}
+
+function plugin_init(){
+
+    if [[ $# -gt 0 ]]; then
+        local paramPort=$1
+    else
+        local paramPort=$DEFAULT_PORT
+    fi
+
+    if ! [[ "$paramPort" =~ ^[0-9]+$ ]]; then
+        echo "ERROR: $paramPort is not an integer"
+        return 1
+    fi
+
+    if [[ ! -d $PATH_ROOT/data ]]; then
+        mkdir $PATH_ROOT/data
+    fi
+
+    if [[ ! -d $PATH_ROOT/var ]]; then
+        mkdir $PATH_ROOT/var
+    fi
+
+    if [[ ! -d $PATH_ROOT/log ]]; then
+        mkdir $PATH_ROOT/log
+    fi
+
+    cp $PATH_ROOT/etc/mysql.config.tpl $PATH_ROOT/etc/mysql.config
+
+    baseDirReg=$(echo ${arg_baseDir} |sed -e 's/\//\\\//g')
+    pathRootReg=$(echo ${PATH_ROOT} |sed -e 's/\//\\\//g')
+
+    sed -i "s/{PORT}/$paramPort/g" $PATH_ROOT/etc/mysql.config
+    sed -i "s/{ROOT_PATH}/$pathRootReg/g" $PATH_ROOT/etc/mysql.config
+    sed -i "s/{BASE_PATH}/$baseDirReg/g" $PATH_ROOT/etc/mysql.config
+
+    $arg_baseDir/bin/mysql_install_db \
+        --defaults-file=$PATH_ROOT/etc/mysql.config \
+        --basedir=$arg_baseDir
+
+    if [[ 0 -ne $? ]]; then
+        echo "ERROR: mysql_install_db fail"
+        return 1
+    fi
+
+    return 0
+
+}
