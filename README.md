@@ -1,5 +1,5 @@
 # mysql_control
-```
+```bash
 mysql_control -h
 ```
 
@@ -11,7 +11,7 @@ mysql_control -h
 - stop
 
 # plugin template
-```
+```bash
 #!/usr/bin/env bash
 
 arg_methods[${#arg_methods[@]}]="{{plugin_name}}"
