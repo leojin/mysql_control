@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 arg_methods[${#arg_methods[@]}]="start"
 
 function pluginHelp_start(){
@@ -9,7 +11,7 @@ EOF
 function plugin_start(){
 
     if [[ -f $PATH_ROOT/var/mysqld.pid ]]; then
-        echo "ERROR: mysql(`cat $PATH_ROOT/var/mysqld.pid`) is running"
+        log ERROR "mysql(`cat $PATH_ROOT/var/mysqld.pid`) is running"
         return 1
     fi
 
@@ -19,11 +21,11 @@ function plugin_start(){
     sleep 1
 
     if [[ ! -f $PATH_ROOT/var/mysqld.pid ]]; then
-        echo "ERROR: mysql start fail"
+        log ERROR "mysql start fail"
         return 1
     fi
 
-    echo "INFO: mysql start success"
+    log INFO "mysql start success"
 
     return 0
 

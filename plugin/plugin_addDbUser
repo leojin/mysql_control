@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 arg_methods[${#arg_methods[@]}]="addDbUser"
 
 function pluginHelp_addDbUser(){
@@ -13,7 +15,7 @@ EOF
 function plugin_addDbUser(){
 
     if [[ $# -lt 4 ]]; then
-        echo "ERROR: addDbUser <db_name> <user_name> <user_pass> <user_host>"
+        log ERROR "addDbUser <db_name> <user_name> <user_pass> <user_host>"
         return 1
     fi
 
@@ -26,7 +28,7 @@ function plugin_addDbUser(){
         || "" == "$paramUserName" \
         || "" == "$paramUserPass" \
         || "" == "$paramUserHost" ]]; then
-        echo "ERROR: addDbUser param empty"
+        log ERROR "addDbUser param empty"
         return 1
     fi
 
@@ -44,7 +46,7 @@ function plugin_addDbUser(){
         -e "SHOW DATABASES LIKE \"${paramDbName}\"" 2>/dev/null`
 
     if [[ 0 -ne $? ]]; then
-        echo "ERROR: get db list fail"
+        log ERROR "get db list fail"
         return 1
     fi
 
@@ -56,10 +58,10 @@ function plugin_addDbUser(){
             -e "CREATE DATABASE \`${paramDbName}\`;"
 
         if [[ 0 -ne $? ]]; then
-            echo "ERROR: create database ${paramDbName} fail"
+            log ERROR "create database ${paramDbName} fail"
             return 1
         fi
-        echo "INFO: create database ${paramDbName} success"
+        log INFO "create database ${paramDbName} success"
     fi
 
     $arg_baseDir/bin/mysql \
@@ -72,11 +74,11 @@ function plugin_addDbUser(){
                 (\"${paramUserHost}\", \"${paramUserName}\", PASSWORD(\"${paramUserPass}\"));FLUSH PRIVILEGES;"
 
     if [[ 0 -ne $? ]]; then
-        echo "ERROR: add user ${paramUserName}:${paramUserPass}@${paramUserHost} fail"
+        log ERROR "add user ${paramUserName}:${paramUserPass}@${paramUserHost} fail"
         return 1
     fi
 
-    echo "INFO: add user ${paramUserName}:${paramUserPass}@${paramUserHost} success"
+    log INFO "add user ${paramUserName}:${paramUserPass}@${paramUserHost} success"
 
     $arg_baseDir/bin/mysql \
         -S $PATH_ROOT/var/mysqld.sock \
@@ -90,11 +92,11 @@ function plugin_addDbUser(){
                 \"${paramUserPass}\";FLUSH PRIVILEGES;"
 
     if [[ 0 -ne $? ]]; then
-        echo "ERROR: grant privileges ${paramUserName}:${paramUserPass}@${paramUserHost} on ${paramDbName} fail"
+        log ERROR "grant privileges ${paramUserName}:${paramUserPass}@${paramUserHost} on ${paramDbName} fail"
         return 1
     fi
 
-    echo "INFO: add user ${paramUserName}:${paramUserPass}@${paramUserHost} on ${paramDbName} success"
+    log INFO "add user ${paramUserName}:${paramUserPass}@${paramUserHost} on ${paramDbName} success"
 
     return 0
 

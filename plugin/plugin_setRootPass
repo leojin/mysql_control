@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 arg_methods[${#arg_methods[@]}]="setRootPass"
 
 function pluginHelp_setRootPass(){
@@ -10,7 +12,7 @@ EOF
 function plugin_setRootPass(){
 
     if [[ $# -lt 1 ]]; then
-        echo "ERROR: setRootPass <new_password>"
+        log ERROR "setRootPass <new_password>"
         return 1
     fi
 
@@ -29,7 +31,7 @@ function plugin_setRootPass(){
         -e 'DELETE FROM mysql.user WHERE user="";FLUSH PRIVILEGES;'
 
     if [[ 0 -ne $? ]]; then
-        echo "ERROR: clear empty user fail"
+        log ERROR "clear empty user fail"
         return 1
     fi
 
@@ -40,11 +42,11 @@ function plugin_setRootPass(){
         password $paramPassword
 
     if [[ 0 -ne $? ]]; then
-        echo "ERROR: change root password fail"
+        log ERROR "change root password fail"
         return 1
     fi
 
-    echo "INFO: change root password success"
+    log INFO "change root password success"
 
     return 0
 

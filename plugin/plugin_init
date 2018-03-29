@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 arg_methods[${#arg_methods[@]}]="init"
 
 function pluginHelp_init(){
@@ -16,7 +18,7 @@ function plugin_init(){
     fi
 
     if ! [[ "$paramPort" =~ ^[0-9]+$ ]]; then
-        echo "ERROR: $paramPort is not an integer"
+        log ERROR "$paramPort is not an integer"
         return 1
     fi
 
@@ -46,7 +48,7 @@ function plugin_init(){
         --basedir=$arg_baseDir
 
     if [[ 0 -ne $? ]]; then
-        echo "ERROR: mysql_install_db fail"
+        log ERROR "mysql_install_db fail"
         return 1
     fi
 
