@@ -29,6 +29,7 @@ max_allowed_packet      = 16M
 
 [mysql]
 no-auto-rehash
+max_allowed_packet      = 64M
 
 [myisamchk]
 key_buffer_size         = 256M
