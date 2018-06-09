@@ -43,7 +43,18 @@ function plugin_init(){
     sed -i "s/{ROOT_PATH}/$pathRootReg/g" $PATH_ROOT/etc/mysql.config
     sed -i "s/{BASE_PATH}/$baseDirReg/g" $PATH_ROOT/etc/mysql.config
 
-    $arg_baseDir/bin/mysql_install_db \
+    toolInstall=""
+
+    if [[ -f $arg_baseDir/bin/mysql_install_db ]]; then
+        toolInstall=$arg_baseDir/bin/mysql_install_db
+    elif [[ -f $arg_baseDir/scripts/mysql_install_db ]]; then
+        toolInstall=$arg_baseDir/scripts/mysql_install_db
+    else
+        log ERROR "mysql_install_db not found"
+        return 1
+    fi
+
+    $toolInstall \
         --defaults-file=$PATH_ROOT/etc/mysql.config \
         --basedir=$arg_baseDir
 

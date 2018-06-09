@@ -84,10 +84,6 @@ function main(){
                     log ERROR "${arg_baseDir}/bin/mysqld_safe not exist"
                     return 1
                 fi
-                if [[ ! -f $arg_baseDir/bin/mysql_install_db ]]; then
-                    log ERROR "${arg_baseDir}/bin/mysql_install_db not exist"
-                    return 1
-                fi
                 ;;
             p )
                 arg_password=$OPTARG
