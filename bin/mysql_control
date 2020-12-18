@@ -3,8 +3,13 @@
 #set -x
 
 readonly PATH_ROOT=$(cd `dirname $0`/..; pwd)
+readonly OS_NAME=$(uname)
 
 eval `cat $PATH_ROOT/etc/params.env`
+
+if [ "$OS_NAME" == "Darwin" ]; then
+    eval `cat $PATH_ROOT/etc/params_mac.env`
+fi
 
 arg_baseDir=$DEFAULT_BASEDIR
 arg_password=$DEFAULT_PASSWORD
