@@ -39,9 +39,16 @@ function plugin_init(){
     baseDirReg=$(echo ${arg_baseDir} |sed -e 's/\//\\\//g')
     pathRootReg=$(echo ${PATH_ROOT} |sed -e 's/\//\\\//g')
 
-    sed -i "s/{PORT}/$paramPort/g" $PATH_ROOT/etc/mysql.config
-    sed -i "s/{ROOT_PATH}/$pathRootReg/g" $PATH_ROOT/etc/mysql.config
-    sed -i "s/{BASE_PATH}/$baseDirReg/g" $PATH_ROOT/etc/mysql.config
+    os=$(uname)
+    if [ $os == "Darwin" ]; then
+        sed -i "" -e "s/{PORT}/$paramPort/g" $PATH_ROOT/etc/mysql.config
+        sed -i "" -e "s/{ROOT_PATH}/$pathRootReg/g" $PATH_ROOT/etc/mysql.config
+        sed -i "" -e "s/{BASE_PATH}/$baseDirReg/g" $PATH_ROOT/etc/mysql.config
+    else
+        sed -i "s/{PORT}/$paramPort/g" $PATH_ROOT/etc/mysql.config
+        sed -i "s/{ROOT_PATH}/$pathRootReg/g" $PATH_ROOT/etc/mysql.config
+        sed -i "s/{BASE_PATH}/$baseDirReg/g" $PATH_ROOT/etc/mysql.config
+    fi
 
     toolInstall=""
 
