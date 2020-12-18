@@ -21,6 +21,13 @@ query_cache_size        = 32M
 innodb_file_per_table   = 1
 thread_concurrency      = 8
 server-id               = 1
+group_concat_max_len    = 65536
+general_log             = on
+general_log_file        = {ROOT_PATH}/log/mysql.log
+slow_query_log          = on
+long_query_time         = 2
+slow-query-log-file     = {ROOT_PATH}/log/slowquery.log
+log-queries-not-using-indexes = on
 skip-external-locking
 
 [mysqldump]

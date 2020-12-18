@@ -18,7 +18,7 @@ function plugin_start(){
     nohup $arg_baseDir/bin/mysqld_safe \
         --defaults-file=$PATH_ROOT/etc/mysql.config >$PATH_ROOT/log/nohup.log 2>$PATH_ROOT/log/nohup.err &
 
-    sleep 1
+    sleep 5
 
     if [[ ! -f $PATH_ROOT/var/mysqld.pid ]]; then
         log ERROR "mysql start fail"

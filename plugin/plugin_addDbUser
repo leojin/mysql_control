@@ -87,7 +87,7 @@ function plugin_addDbUser(){
         -e "GRANT ALL PRIVILEGES ON \
                 \`${paramDbName}\`.* \
             TO \
-                ${paramUserName}@${paramUserHost} \
+                \"${paramUserName}\"@\"${paramUserHost}\" \
             IDENTIFIED BY \
                 \"${paramUserPass}\";FLUSH PRIVILEGES;"
 
